@@ -9,7 +9,7 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "composite": true,
-    "incremental": false
+    "incremental": true
   },
   "exclude": ["packages/**/tests/**", "packages/**/dist/**"],
   "references": [
