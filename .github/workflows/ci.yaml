@@ -76,9 +76,9 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-        working-directory: ./apps/api/gateway
+        working-directory: ./apps/api
       - name: pnpm test
-        working-directory: ./apps/api/gateway
+        working-directory: ./apps/api
         run: pnpm test
   test-web:
     name: "Testing dashboard"
