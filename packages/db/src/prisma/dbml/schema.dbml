@@ -1,0 +1,356 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  email String [unique, not null]
+  firstname String [not null]
+  lastname String [not null]
+  password String [not null]
+  phone String
+  picture String
+  address String
+  city String
+  ahr Int
+  crn String
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  authMethod AuthMethod [not null]
+  Workspace Workspace [not null]
+  WorkingTime WorkingTime [not null]
+  WorkspaceLabel WorkspaceLabel [not null]
+  createdUserStories UserStory [not null]
+  assignedUserStories UserStory [not null]
+  Epic Epic [not null]
+  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
+  ownedTeams Team [not null]
+  memberOf Team [not null]
+  TeamPolicy TeamPolicy [not null]
+  Sprint Sprint [not null]
+  Comment Comment [not null]
+  Library Library [not null]
+  Directory Directory [not null]
+  Document Document [not null]
+  Attachment Attachment [not null]
+}
+
+Table Workspace {
+  id String [pk]
+  name String [not null]
+  description String
+  key String [not null]
+  active Boolean [default: true]
+  createdBy User [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  history Json [default: '[]']
+  userId String [not null]
+  WorkingTime WorkingTime [not null]
+  WorkspaceLabel WorkspaceLabel [not null]
+  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
+  Team Team [not null]
+  Sprint Sprint [not null]
+  UserStory UserStory [not null]
+  Epic Epic [not null]
+}
+
+Table Team {
+  id String [pk]
+  workspace Workspace [not null]
+  name String [not null]
+  createdBy User [not null]
+  members User [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  workspaceId String [not null]
+  userId String [not null]
+  TeamPolicy TeamPolicy [not null]
+}
+
+Table TeamPolicy {
+  id String [pk]
+  name String [not null]
+  createdBy User [not null]
+  userId String [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime
+  team Team [not null]
+  teamId String [not null]
+  history Json [default: '[]']
+}
+
+Table WorkspaceLabel {
+  id String [pk]
+  workspace Workspace [not null]
+  name String [not null]
+  color Json [default: '{}']
+  createdBy User [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime
+  history Json [default: '[]']
+  workspaceId String [not null]
+  userId String [not null]
+  UserStory UserStory [not null]
+  Epic Epic [not null]
+}
+
+Table WorkspaceStoryStatus {
+  id String [pk]
+  workspace Workspace [not null]
+  name String [not null]
+  done Boolean [not null, default: false]
+  createdBy User [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime
+  history Json [default: '[]']
+  workspaceId String [not null]
+  userId String [not null]
+  UserStory UserStory [not null]
+}
+
+Table WorkingTime {
+  id String [pk]
+  name String
+  workspace Workspace [not null]
+  status WorkingTimeStatus [not null]
+  starting DateTime [default: `now()`]
+  ending DateTime
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  UserStory UserStory [not null]
+  userStoryId String [not null]
+  updatedAt DateTime
+  history Json [default: '[]']
+  workspaceId String [not null]
+  userId String [not null]
+}
+
+Table UserStory {
+  id String [pk]
+  name String [not null]
+  description String
+  deadline DateTime
+  points Int
+  priority Int
+  labels WorkspaceLabel [not null]
+  Attachment Attachment [not null]
+  parentId String
+  parent UserStory
+  dependencies UserStory [not null]
+  epic Epic
+  epicId String
+  assignedTo User [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  createdBy User [not null]
+  workspace Workspace [not null]
+  workspaceId String [not null]
+  history Json [default: '[]']
+  userId String [not null]
+  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
+  workspaceStoryStatusId String [not null]
+  Sprint Sprint
+  sprintId String
+  WorkingTime WorkingTime [not null]
+}
+
+Table Epic {
+  id String [pk]
+  name String [not null]
+  description String
+  deadline DateTime
+  done Boolean [not null, default: false]
+  points Int
+  priority Int
+  labels WorkspaceLabel [not null]
+  Attachment Attachment [not null]
+  UserStory UserStory [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  createdBy User [not null]
+  workspace Workspace [not null]
+  workspaceId String [not null]
+  history Json [default: '[]']
+  userId String [not null]
+}
+
+Table Sprint {
+  id String [pk]
+  name String [not null]
+  description String
+  starting DateTime
+  ending DateTime
+  userStories UserStory [not null]
+  workspace Workspace [not null]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  createdBy User [not null]
+  history Json [default: '[]']
+  userId String [not null]
+  workspaceId String [not null]
+}
+
+Table Attachment {
+  id String [pk]
+  name String [not null]
+  path String [not null]
+  filetype FileType [not null]
+  description String
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime [default: `now()`]
+  createdBy User [not null]
+  userId String [not null]
+  history Json [default: '[]']
+  UserStory UserStory
+  userStoryId String
+  Epic Epic
+  epicId String
+  Directory Directory
+  DirectoryId String
+}
+
+Table Comment {
+  id String [pk]
+  content String
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  history Json
+  userId String [not null]
+  relatedTo String [not null]
+}
+
+Table Library {
+  id String [pk]
+  name String [not null]
+  directories Directory [not null]
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  history Json
+  userId String [not null]
+}
+
+Table Directory {
+  id String [pk]
+  name String [not null]
+  documents Document [not null]
+  attachments Attachment [not null]
+  library Library [not null]
+  libraryId String [not null]
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  history Json
+  userId String [not null]
+}
+
+Table Document {
+  id String [pk]
+  name String [not null]
+  content Json [not null, default: '{}']
+  directory Directory [not null]
+  directoryId String [not null]
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  history Json
+  userId String [not null]
+}
+
+Table Customer {
+  id String [pk]
+  name String [not null]
+  type CustomerType [not null, default: 'Company']
+  address String [not null]
+  city String [not null]
+  phone String [not null]
+}
+
+Enum CustomerType {
+  Company
+  Customer
+}
+
+Enum AuthMethod {
+  NATIVE
+  GOOGLE
+  GITHUB
+}
+
+Enum WorkingTimeStatus {
+  Active
+  Suspend
+  End
+}
+
+Enum FileType {
+  Picture
+  Document
+  Other
+}
+
+Ref: Workspace.userId > User.id
+
+Ref: Team.workspaceId > Workspace.id
+
+Ref: Team.userId > User.id
+
+Ref: TeamPolicy.userId > User.id
+
+Ref: TeamPolicy.teamId > Team.id
+
+Ref: WorkspaceLabel.workspaceId > Workspace.id
+
+Ref: WorkspaceLabel.userId > User.id
+
+Ref: WorkspaceStoryStatus.workspaceId > Workspace.id
+
+Ref: WorkspaceStoryStatus.userId > User.id
+
+Ref: WorkingTime.workspaceId > Workspace.id
+
+Ref: WorkingTime.userId > User.id
+
+Ref: WorkingTime.userStoryId > UserStory.id
+
+Ref: UserStory.parentId - UserStory.id
+
+Ref: UserStory.epicId > Epic.id
+
+Ref: UserStory.userId > User.id
+
+Ref: UserStory.workspaceId > Workspace.id
+
+Ref: UserStory.workspaceStoryStatusId > WorkspaceStoryStatus.id
+
+Ref: UserStory.sprintId > Sprint.id
+
+Ref: Epic.userId > User.id
+
+Ref: Epic.workspaceId > Workspace.id
+
+Ref: Sprint.workspaceId > Workspace.id
+
+Ref: Sprint.userId > User.id
+
+Ref: Attachment.userId > User.id
+
+Ref: Attachment.userStoryId > UserStory.id
+
+Ref: Attachment.epicId > Epic.id
+
+Ref: Attachment.DirectoryId > Directory.id
+
+Ref: Comment.userId > User.id
+
+Ref: Library.userId > User.id
+
+Ref: Directory.libraryId > Library.id
+
+Ref: Directory.userId > User.id
+
+Ref: Document.directoryId > Directory.id
+
+Ref: Document.userId > User.id

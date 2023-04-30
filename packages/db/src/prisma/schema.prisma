@@ -1,0 +1,302 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("PRISMA_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+model User {
+  id                   String                 @id @unique @default(cuid())
+  email                String                 @unique
+  firstname            String
+  lastname             String
+  password             String
+  phone                String?
+  picture              String?
+  address              String?
+  city                 String?
+  ahr                  Int? // Average Hourly Rate
+  crn                  String? // Company Register Number
+  createdAt            DateTime?              @default(now())
+  updatedAt            DateTime?              @default(now())
+  authMethod           AuthMethod
+  Workspace            Workspace[]            @relation()
+  WorkingTime          WorkingTime[]          @relation()
+  WorkspaceLabel       WorkspaceLabel[]       @relation()
+  createdUserStories   UserStory[]            @relation()
+  assignedUserStories  UserStory[]            @relation("assignedTo")
+  Epic                 Epic[]                 @relation()
+  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
+  ownedTeams           Team[]                 @relation("createdBy")
+  memberOf             Team[]                 @relation("members")
+  TeamPolicy           TeamPolicy[]           @relation()
+  Sprint               Sprint[]               @relation()
+  Comment              Comment[]              @relation()
+  Library              Library[]              @relation()
+  Directory            Directory[]            @relation()
+  Document             Document[]             @relation()
+  Attachment           Attachment[]           @relation()
+}
+
+model Workspace {
+  id                   String                 @id @unique @default(cuid())
+  name                 String
+  description          String?
+  key                  String
+  active               Boolean?               @default(true)
+  createdBy            User                   @relation(fields: [userId], references: [id])
+  createdAt            DateTime?              @default(now())
+  updatedAt            DateTime?              @default(now())
+  history              Json?                  @default("[]")
+  userId               String
+  WorkingTime          WorkingTime[]          @relation()
+  WorkspaceLabel       WorkspaceLabel[]       @relation()
+  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
+  Team                 Team[]                 @relation()
+  Sprint               Sprint[]               @relation()
+  UserStory            UserStory[]            @relation()
+  Epic                 Epic[]                 @relation()
+}
+
+model Team {
+  id          String       @id @unique @default(cuid())
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
+  name        String
+  createdBy   User         @relation("createdBy", fields: [userId], references: [id])
+  members     User[]       @relation("members")
+  createdAt   DateTime?    @default(now())
+  updatedAt   DateTime?    @default(now())
+  workspaceId String
+  userId      String
+  TeamPolicy  TeamPolicy[]
+}
+
+model TeamPolicy {
+  id        String    @id @unique @default(cuid())
+  name      String
+  createdBy User      @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  team      Team      @relation(fields: [teamId], references: [id])
+  teamId    String
+  history   Json?     @default("[]")
+}
+
+model WorkspaceLabel {
+  id          String      @id @unique @default(cuid())
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  name        String
+  color       Json?       @default("{}")
+  createdBy   User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime?   @default(now())
+  updatedAt   DateTime?
+  history     Json?       @default("[]")
+  workspaceId String
+  userId      String
+  UserStory   UserStory[]
+  Epic        Epic[]
+}
+
+model WorkspaceStoryStatus {
+  id          String      @id @unique @default(cuid())
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  name        String
+  done        Boolean     @default(false)
+  createdBy   User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime?   @default(now())
+  updatedAt   DateTime?
+  history     Json?       @default("[]")
+  workspaceId String
+  userId      String
+  UserStory   UserStory[]
+}
+
+model WorkingTime {
+  id          String            @id @unique @default(cuid())
+  name        String?
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  status      WorkingTimeStatus
+  starting    DateTime?         @default(now())
+  ending      DateTime?
+  createdAt   DateTime?         @default(now())
+  createdBy   User              @relation(fields: [userId], references: [id])
+  UserStory   UserStory         @relation(fields: [userStoryId], references: [id])
+  userStoryId String
+  updatedAt   DateTime?
+  history     Json?             @default("[]")
+  workspaceId String
+  userId      String
+}
+
+model UserStory {
+  id                     String               @id @unique @default(cuid())
+  name                   String
+  description            String?
+  deadline               DateTime?
+  points                 Int?
+  priority               Int?
+  labels                 WorkspaceLabel[]     @relation()
+  Attachment             Attachment[]         @relation()
+  parentId               String?
+  parent                 UserStory?           @relation("Parent", fields: [parentId], references: [id])
+  dependencies           UserStory[]          @relation("Parent")
+  epic                   Epic?                @relation(fields: [epicId], references: [id])
+  epicId                 String?
+  assignedTo             User[]               @relation("assignedTo")
+  createdAt              DateTime?            @default(now())
+  updatedAt              DateTime?            @default(now())
+  createdBy              User                 @relation(fields: [userId], references: [id])
+  workspace              Workspace            @relation(fields: [workspaceId], references: [id])
+  workspaceId            String
+  history                Json?                @default("[]")
+  userId                 String
+  WorkspaceStoryStatus   WorkspaceStoryStatus @relation(fields: [workspaceStoryStatusId], references: [id])
+  workspaceStoryStatusId String
+  Sprint                 Sprint?              @relation(fields: [sprintId], references: [id])
+  sprintId               String?
+  WorkingTime            WorkingTime[]        @relation()
+}
+
+model Epic {
+  id          String           @id @unique @default(cuid())
+  name        String
+  description String?
+  deadline    DateTime?
+  done        Boolean          @default(false)
+  points      Int?
+  priority    Int?
+  labels      WorkspaceLabel[] @relation()
+  Attachment  Attachment[]     @relation()
+  UserStory   UserStory[]      @relation()
+  createdAt   DateTime?        @default(now())
+  updatedAt   DateTime?        @default(now())
+  createdBy   User             @relation(fields: [userId], references: [id])
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  history     Json?            @default("[]")
+  userId      String
+}
+
+model Sprint {
+  id          String      @id @unique @default(cuid())
+  name        String
+  description String?
+  starting    DateTime?
+  ending      DateTime?
+  userStories UserStory[] @relation()
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime?   @default(now())
+  updatedAt   DateTime?   @default(now())
+  createdBy   User        @relation(fields: [userId], references: [id])
+  history     Json?       @default("[]")
+  userId      String
+  workspaceId String
+}
+
+model Attachment {
+  id          String     @id @unique @default(cuid())
+  name        String
+  path        String
+  filetype    FileType
+  description String?
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @default(now())
+  createdBy   User       @relation(fields: [userId], references: [id])
+  userId      String
+  history     Json?      @default("[]")
+  UserStory   UserStory? @relation(fields: [userStoryId], references: [id])
+  userStoryId String?
+  Epic        Epic?      @relation(fields: [epicId], references: [id])
+  epicId      String?
+  Directory   Directory? @relation(fields: [DirectoryId], references: [id])
+  DirectoryId String?
+}
+
+model Comment {
+  id        String    @id @unique @default(cuid())
+  content   String?
+  updatedAt DateTime? @default(now())
+  createdAt DateTime? @default(now())
+  createdBy User      @relation(fields: [userId], references: [id])
+  history   Json?
+  userId    String
+  relatedTo String
+}
+
+model Library {
+  id          String      @id @unique @default(cuid())
+  name        String
+  directories Directory[] @relation()
+  updatedAt   DateTime?   @default(now())
+  createdAt   DateTime?   @default(now())
+  createdBy   User        @relation(fields: [userId], references: [id])
+  history     Json?
+  userId      String
+}
+
+model Directory {
+  id          String       @id @unique @default(cuid())
+  name        String
+  documents   Document[]   @relation()
+  attachments Attachment[] @relation()
+  library     Library      @relation(fields: [libraryId], references: [id])
+  libraryId   String
+  updatedAt   DateTime?    @default(now())
+  createdAt   DateTime?    @default(now())
+  createdBy   User         @relation(fields: [userId], references: [id])
+  history     Json?
+  userId      String
+}
+
+model Document {
+  id          String    @id @unique @default(cuid())
+  name        String
+  content     Json      @default("{}")
+  directory   Directory @relation(fields: [directoryId], references: [id])
+  directoryId String
+  updatedAt   DateTime? @default(now())
+  createdAt   DateTime? @default(now())
+  createdBy   User      @relation(fields: [userId], references: [id])
+  history     Json?
+  userId      String
+}
+
+model Customer {
+  id      String       @id @unique @default(cuid())
+  name    String
+  type    CustomerType @default(Company)
+  address String
+  city    String
+  phone   String
+}
+
+enum CustomerType {
+  Company
+  Customer
+}
+
+enum AuthMethod {
+  NATIVE
+  GOOGLE
+  GITHUB
+}
+
+enum WorkingTimeStatus {
+  Active
+  Suspend
+  End
+}
+
+enum FileType {
+  Picture
+  Document
+  Other
+}

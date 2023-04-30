@@ -1,0 +1,48 @@
+{
+  "name": "@pito/db",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.js",
+  "scripts": {
+    "postinstall": "run-s generate build",
+    "prebuild": "rimraf dist",
+    "build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc -p tsconfig.build.json -w --preserveWatchOutput",
+    "start:dev": "npx run build:watch",
+    "validate": "prisma validate",
+    "migrate": "prisma migrate --preview-feature",
+    "migrate:dev": "prisma migrate dev --preview-feature",
+    "migrate:dev:create": "prisma migrate dev --create-only --preview-feature",
+    "migrate:reset": "prisma migrate reset --preview-feature",
+    "migrate:deploy": "npx prisma migrate deploy --preview-feature",
+    "migrate:status": "npx prisma migrate status --preview-feature",
+    "migrate:resolve": "npx prisma migrate resolve --preview-feature",
+    "studio": "npx prisma studio",
+    "generate": "npx prisma generate",
+    "generate:watch": "npx prisma generate --watch",
+    "start:db": "run-s migrate:up generate seed",
+    "seed": "npx prisma db seed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.16.3",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "prisma": "^4.13.0",
+    "prisma-dbml-generator": "^0.10.0",
+    "tslib": "^2.5.0",
+    "typescript": "5.0.4"
+  },
+  "dependencies": {
+    "@prisma/client": "4.13.0"
+  },
+  "prisma": {
+    "schema": "./src/prisma/schema.prisma",
+    "seed": "ts-node ./src/prisma/seed.ts"
+  }
+}
