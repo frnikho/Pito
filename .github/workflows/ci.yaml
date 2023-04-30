@@ -1,0 +1,102 @@
+name: Building and testing pito project
+on:
+  push:
+    branches:
+      - develop
+      - feat/ci
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    branches:
+      - master
+      - develop
+jobs:
+  build-web:
+    name: "Build dashboard application"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.30.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - name: Pnpm install dependencies
+        working-directory: ./apps/dashboard
+        run: pnpm install --frozen-lockfile
+      - name: Build web app
+        working-directory: ./apps/dashboard
+        run: pnpm build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dashboard-production
+          retention-days: 7
+          path: apps/dashboard/.next
+  build-api:
+    name: 'Build api'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.30.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - name: Install dependencies
+        working-directory: ./apps/api
+        run: pnpm install --frozen-lockfile
+      - name: Build api
+        working-directory: ./apps/api
+        run: pnpm build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-production
+          retention-days: 7
+          path: apps/api/dist
+  test-api:
+    name: "Testing api"
+    needs: build-api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.30.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./apps/api/gateway
+      - name: pnpm test
+        working-directory: ./apps/api/gateway
+        run: pnpm test
+  test-web:
+    name: "Testing dashboard"
+    needs: build-web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.30.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - name: Pnpm install dependencies
+        working-directory: ./apps/dashboard
+        run: pnpm install --frozen-lockfile
+      - name: Testing dashboard components
+        working-directory: ./apps/dashboard
+        run: pnpm test:ci
