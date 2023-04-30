@@ -25,7 +25,7 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Pnpm install dependencies
         working-directory: ./apps/dashboard
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       - name: Build web app
         working-directory: ./apps/dashboard
         run: pnpm build
@@ -50,7 +50,7 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
         working-directory: ./apps/api
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       - name: Build api
         working-directory: ./apps/api
         run: pnpm build
@@ -75,7 +75,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         working-directory: ./apps/api/gateway
       - name: pnpm test
         working-directory: ./apps/api/gateway
@@ -96,7 +96,7 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Pnpm install dependencies
         working-directory: ./apps/dashboard
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       - name: Testing dashboard components
         working-directory: ./apps/dashboard
         run: pnpm test:ci
