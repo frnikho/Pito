@@ -10,7 +10,8 @@
     "dashboard:build": "pnpm --filter dashboard build",
     "prisma:generate": "pnpm --filter db generate",
     "prisma:migrate": "pnpm --filter db migrate:dev",
-    "prisma:validate": "pnpm --filter db validate"
+    "prisma:validate": "pnpm --filter db validate",
+    "types:build": "pnpm --filter types build"
   },
   "keywords": [],
   "author": "",

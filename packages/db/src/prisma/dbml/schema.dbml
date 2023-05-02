@@ -17,22 +17,22 @@ Table User {
   createdAt DateTime [default: `now()`]
   updatedAt DateTime [default: `now()`]
   authMethod AuthMethod [not null]
-  Workspace Workspace [not null]
-  WorkingTime WorkingTime [not null]
-  WorkspaceLabel WorkspaceLabel [not null]
+  workspaces Workspace [not null]
+  workingtimes WorkingTime [not null]
+  createdLabels WorkspaceLabel [not null]
   createdUserStories UserStory [not null]
   assignedUserStories UserStory [not null]
-  Epic Epic [not null]
-  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
-  ownedTeams Team [not null]
+  createdEpics Epic [not null]
+  createdUserStoryStatus WorkspaceStoryStatus [not null]
+  createdTeams Team [not null]
   memberOf Team [not null]
-  TeamPolicy TeamPolicy [not null]
-  Sprint Sprint [not null]
-  Comment Comment [not null]
-  Library Library [not null]
-  Directory Directory [not null]
-  Document Document [not null]
-  Attachment Attachment [not null]
+  createdTeamPolicies TeamPolicy [not null]
+  createdSprints Sprint [not null]
+  createdComments Comment [not null]
+  createdLibraries Library [not null]
+  createdDirectories Directory [not null]
+  createdDocuments Document [not null]
+  createdAttachments Attachment [not null]
 }
 
 Table Workspace {
@@ -46,13 +46,13 @@ Table Workspace {
   updatedAt DateTime [default: `now()`]
   history Json [default: '[]']
   userId String [not null]
-  WorkingTime WorkingTime [not null]
-  WorkspaceLabel WorkspaceLabel [not null]
-  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
-  Team Team [not null]
-  Sprint Sprint [not null]
-  UserStory UserStory [not null]
-  Epic Epic [not null]
+  workingsTimes WorkingTime [not null]
+  labels WorkspaceLabel [not null]
+  userStoryStatus WorkspaceStoryStatus [not null]
+  teams Team [not null]
+  sprints Sprint [not null]
+  userStories UserStory [not null]
+  epics Epic [not null]
 }
 
 Table Team {
@@ -118,7 +118,7 @@ Table WorkingTime {
   ending DateTime
   createdAt DateTime [default: `now()`]
   createdBy User [not null]
-  UserStory UserStory [not null]
+  userStory UserStory [not null]
   userStoryId String [not null]
   updatedAt DateTime
   history Json [default: '[]']
@@ -134,7 +134,7 @@ Table UserStory {
   points Int
   priority Int
   labels WorkspaceLabel [not null]
-  Attachment Attachment [not null]
+  attachments Attachment [not null]
   parentId String
   parent UserStory
   dependencies UserStory [not null]
@@ -148,9 +148,9 @@ Table UserStory {
   workspaceId String [not null]
   history Json [default: '[]']
   userId String [not null]
-  WorkspaceStoryStatus WorkspaceStoryStatus [not null]
+  status WorkspaceStoryStatus [not null]
   workspaceStoryStatusId String [not null]
-  Sprint Sprint
+  sprint Sprint
   sprintId String
   WorkingTime WorkingTime [not null]
 }
@@ -164,8 +164,8 @@ Table Epic {
   points Int
   priority Int
   labels WorkspaceLabel [not null]
-  Attachment Attachment [not null]
-  UserStory UserStory [not null]
+  attachments Attachment [not null]
+  userStories UserStory [not null]
   createdAt DateTime [default: `now()`]
   updatedAt DateTime [default: `now()`]
   createdBy User [not null]
@@ -202,11 +202,11 @@ Table Attachment {
   createdBy User [not null]
   userId String [not null]
   history Json [default: '[]']
-  UserStory UserStory
+  userStory UserStory
   userStoryId String
-  Epic Epic
+  epic Epic
   epicId String
-  Directory Directory
+  directory Directory
   DirectoryId String
 }
 

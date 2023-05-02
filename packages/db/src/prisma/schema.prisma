@@ -13,56 +13,56 @@ generator dbml {
 }
 
 model User {
-  id                   String                 @id @unique @default(cuid())
-  email                String                 @unique
-  firstname            String
-  lastname             String
-  password             String
-  phone                String?
-  picture              String?
-  address              String?
-  city                 String?
-  ahr                  Int? // Average Hourly Rate
-  crn                  String? // Company Register Number
-  createdAt            DateTime?              @default(now())
-  updatedAt            DateTime?              @default(now())
-  authMethod           AuthMethod
-  Workspace            Workspace[]            @relation()
-  WorkingTime          WorkingTime[]          @relation()
-  WorkspaceLabel       WorkspaceLabel[]       @relation()
-  createdUserStories   UserStory[]            @relation()
-  assignedUserStories  UserStory[]            @relation("assignedTo")
-  Epic                 Epic[]                 @relation()
-  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
-  ownedTeams           Team[]                 @relation("createdBy")
-  memberOf             Team[]                 @relation("members")
-  TeamPolicy           TeamPolicy[]           @relation()
-  Sprint               Sprint[]               @relation()
-  Comment              Comment[]              @relation()
-  Library              Library[]              @relation()
-  Directory            Directory[]            @relation()
-  Document             Document[]             @relation()
-  Attachment           Attachment[]           @relation()
+  id                     String                 @id @unique @default(cuid())
+  email                  String                 @unique
+  firstname              String
+  lastname               String
+  password               String
+  phone                  String?
+  picture                String?
+  address                String?
+  city                   String?
+  ahr                    Int? // Average Hourly Rate
+  crn                    String? // Company Register Number
+  createdAt              DateTime?              @default(now())
+  updatedAt              DateTime?              @default(now())
+  authMethod             AuthMethod
+  workspaces             Workspace[]            @relation()
+  workingtimes           WorkingTime[]          @relation()
+  createdLabels          WorkspaceLabel[]       @relation()
+  createdUserStories     UserStory[]            @relation()
+  assignedUserStories    UserStory[]            @relation("assignedTo")
+  createdEpics           Epic[]                 @relation()
+  createdUserStoryStatus WorkspaceStoryStatus[] @relation()
+  createdTeams           Team[]                 @relation("createdBy")
+  memberOf               Team[]                 @relation("members")
+  createdTeamPolicies    TeamPolicy[]           @relation()
+  createdSprints         Sprint[]               @relation()
+  createdComments        Comment[]              @relation()
+  createdLibraries       Library[]              @relation()
+  createdDirectories     Directory[]            @relation()
+  createdDocuments       Document[]             @relation()
+  createdAttachments     Attachment[]           @relation()
 }
 
 model Workspace {
-  id                   String                 @id @unique @default(cuid())
-  name                 String
-  description          String?
-  key                  String
-  active               Boolean?               @default(true)
-  createdBy            User                   @relation(fields: [userId], references: [id])
-  createdAt            DateTime?              @default(now())
-  updatedAt            DateTime?              @default(now())
-  history              Json?                  @default("[]")
-  userId               String
-  WorkingTime          WorkingTime[]          @relation()
-  WorkspaceLabel       WorkspaceLabel[]       @relation()
-  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
-  Team                 Team[]                 @relation()
-  Sprint               Sprint[]               @relation()
-  UserStory            UserStory[]            @relation()
-  Epic                 Epic[]                 @relation()
+  id              String                 @id @unique @default(cuid())
+  name            String
+  description     String?
+  key             String
+  active          Boolean?               @default(true)
+  createdBy       User                   @relation(fields: [userId], references: [id])
+  createdAt       DateTime?              @default(now())
+  updatedAt       DateTime?              @default(now())
+  history         Json?                  @default("[]")
+  userId          String
+  workingsTimes   WorkingTime[]          @relation()
+  labels          WorkspaceLabel[]       @relation()
+  userStoryStatus WorkspaceStoryStatus[] @relation()
+  teams           Team[]                 @relation()
+  sprints         Sprint[]               @relation()
+  userStories     UserStory[]            @relation()
+  epics           Epic[]                 @relation()
 }
 
 model Team {
@@ -128,7 +128,7 @@ model WorkingTime {
   ending      DateTime?
   createdAt   DateTime?         @default(now())
   createdBy   User              @relation(fields: [userId], references: [id])
-  UserStory   UserStory         @relation(fields: [userStoryId], references: [id])
+  userStory   UserStory         @relation(fields: [userStoryId], references: [id])
   userStoryId String
   updatedAt   DateTime?
   history     Json?             @default("[]")
@@ -144,7 +144,7 @@ model UserStory {
   points                 Int?
   priority               Int?
   labels                 WorkspaceLabel[]     @relation()
-  Attachment             Attachment[]         @relation()
+  attachments            Attachment[]         @relation()
   parentId               String?
   parent                 UserStory?           @relation("Parent", fields: [parentId], references: [id])
   dependencies           UserStory[]          @relation("Parent")
@@ -158,9 +158,9 @@ model UserStory {
   workspaceId            String
   history                Json?                @default("[]")
   userId                 String
-  WorkspaceStoryStatus   WorkspaceStoryStatus @relation(fields: [workspaceStoryStatusId], references: [id])
+  status                 WorkspaceStoryStatus @relation(fields: [workspaceStoryStatusId], references: [id])
   workspaceStoryStatusId String
-  Sprint                 Sprint?              @relation(fields: [sprintId], references: [id])
+  sprint                 Sprint?              @relation(fields: [sprintId], references: [id])
   sprintId               String?
   WorkingTime            WorkingTime[]        @relation()
 }
@@ -174,8 +174,8 @@ model Epic {
   points      Int?
   priority    Int?
   labels      WorkspaceLabel[] @relation()
-  Attachment  Attachment[]     @relation()
-  UserStory   UserStory[]      @relation()
+  attachments Attachment[]     @relation()
+  userStories UserStory[]      @relation()
   createdAt   DateTime?        @default(now())
   updatedAt   DateTime?        @default(now())
   createdBy   User             @relation(fields: [userId], references: [id])
@@ -212,11 +212,11 @@ model Attachment {
   createdBy   User       @relation(fields: [userId], references: [id])
   userId      String
   history     Json?      @default("[]")
-  UserStory   UserStory? @relation(fields: [userStoryId], references: [id])
+  userStory   UserStory? @relation(fields: [userStoryId], references: [id])
   userStoryId String?
-  Epic        Epic?      @relation(fields: [epicId], references: [id])
+  epic        Epic?      @relation(fields: [epicId], references: [id])
   epicId      String?
-  Directory   Directory? @relation(fields: [DirectoryId], references: [id])
+  directory   Directory? @relation(fields: [DirectoryId], references: [id])
   DirectoryId String?
 }
 
