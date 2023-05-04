@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import {INestApplication, ValidationPipe} from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '../src/api/app.module';
+import {PrismaService} from "../src/prisma/prisma.service";
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -12,13 +13,22 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    const prismaService = app.get(PrismaService);
+    app.useGlobalPipes(new ValidationPipe());
+    await prismaService.enableShutdownHooks(app);
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/auth/login - Should failed with missing json body', () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/auth/login')
+      .expect(400)
+  });
+
+  it('/auth/login - Should failed with missing json body', () => {
+    return request(app.getHttpServer())
+      .post('/auth/login')
+      .send({email: 'a@a.fr', password: '358227'})
+      .expect(400)
   });
 });

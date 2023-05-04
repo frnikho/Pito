@@ -33,6 +33,10 @@ Table User {
   createdDirectories Directory [not null]
   createdDocuments Document [not null]
   createdAttachments Attachment [not null]
+  Template Template [not null]
+  Role Role [not null]
+  role Role [not null]
+  roleId String [not null]
 }
 
 Table Workspace {
@@ -268,6 +272,50 @@ Table Customer {
   phone String [not null]
 }
 
+Table Template {
+  id String [pk]
+  name String [not null]
+  content String [not null]
+  itemType TemplateItemType [not null]
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User [not null]
+  userId String [not null]
+  history Json
+}
+
+Table Role {
+  id String [pk]
+  name String [not null]
+  default Boolean [not null, default: false]
+  user Json [not null]
+  workspace Json [not null]
+  workspaceLabel Json [not null]
+  workspaceStatus Json [not null]
+  workingTime Json [not null]
+  team Json [not null]
+  template Json [not null]
+  teamPolicy Json [not null]
+  document Json [not null]
+  sprint Json [not null]
+  epic Json [not null]
+  userStory Json [not null]
+  attachment Json [not null]
+  role Json [not null]
+  description String [not null]
+  updatedAt DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`]
+  createdBy User
+  userId String
+  history Json
+  User User [not null]
+}
+
+Enum TemplateItemType {
+  UserStory
+  Epic
+}
+
 Enum CustomerType {
   Company
   Customer
@@ -290,6 +338,8 @@ Enum FileType {
   Document
   Other
 }
+
+Ref: User.roleId - Role.id
 
 Ref: Workspace.userId > User.id
 
@@ -354,3 +404,7 @@ Ref: Directory.userId > User.id
 Ref: Document.directoryId > Directory.id
 
 Ref: Document.userId > User.id
+
+Ref: Template.userId > User.id
+
+Ref: Role.userId > User.id
