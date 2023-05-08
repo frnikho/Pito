@@ -13,60 +13,64 @@ generator dbml {
 }
 
 model User {
-  id                   String                 @id @unique @default(cuid())
-  email                String                 @unique
-  firstname            String
-  lastname             String
-  password             String
-  phone                String?
-  picture              String?
-  address              String?
-  city                 String?
-  ahr                  Int? // Average Hourly Rate
-  crn                  String? // Company Register Number
-  createdAt            DateTime?              @default(now())
-  updatedAt            DateTime?              @default(now())
-  authMethod           AuthMethod
-  Workspace            Workspace[]            @relation()
-  WorkingTime          WorkingTime[]          @relation()
-  WorkspaceLabel       WorkspaceLabel[]       @relation()
-  createdUserStories   UserStory[]            @relation()
-  assignedUserStories  UserStory[]            @relation("assignedTo")
-  Epic                 Epic[]                 @relation()
-  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
-  ownedTeams           Team[]                 @relation("createdBy")
-  memberOf             Team[]                 @relation("members")
-  TeamPolicy           TeamPolicy[]           @relation()
-  Sprint               Sprint[]               @relation()
-  Comment              Comment[]              @relation()
-  Library              Library[]              @relation()
-  Directory            Directory[]            @relation()
-  Document             Document[]             @relation()
-  Attachment           Attachment[]           @relation()
+  id                     String                 @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
+  email                  String                 @unique
+  firstname              String
+  lastname               String
+  password               String
+  phone                  String?
+  picture                String?
+  address                String?
+  city                   String?
+  ahr                    Int? // Average Hourly Rate
+  crn                    String? // Company Register Number
+  createdAt              DateTime?              @default(now())
+  updatedAt              DateTime?              @default(now())
+  authMethod             AuthMethod
+  workspaces             Workspace[]            @relation()
+  workingtimes           WorkingTime[]          @relation()
+  createdLabels          WorkspaceLabel[]       @relation()
+  createdUserStories     UserStory[]            @relation()
+  assignedUserStories    UserStory[]            @relation("assignedTo")
+  createdEpics           Epic[]                 @relation()
+  createdUserStoryStatus WorkspaceStoryStatus[] @relation()
+  createdTeams           Team[]                 @relation("createdBy")
+  memberOf               Team[]                 @relation("members")
+  createdTeamPolicies    TeamPolicy[]           @relation()
+  createdSprints         Sprint[]               @relation()
+  createdComments        Comment[]              @relation()
+  createdLibraries       Library[]              @relation()
+  createdDirectories     Directory[]            @relation()
+  createdDocuments       Document[]             @relation()
+  createdAttachments     Attachment[]           @relation()
+  Template               Template[]
+  Role                   Role[]                 @relation("createdBy")
+  role                   Role                   @relation(fields: [roleId], references: [id])
+  roleId                 String
 }
 
 model Workspace {
-  id                   String                 @id @unique @default(cuid())
-  name                 String
-  description          String?
-  key                  String
-  active               Boolean?               @default(true)
-  createdBy            User                   @relation(fields: [userId], references: [id])
-  createdAt            DateTime?              @default(now())
-  updatedAt            DateTime?              @default(now())
-  history              Json?                  @default("[]")
-  userId               String
-  WorkingTime          WorkingTime[]          @relation()
-  WorkspaceLabel       WorkspaceLabel[]       @relation()
-  WorkspaceStoryStatus WorkspaceStoryStatus[] @relation()
-  Team                 Team[]                 @relation()
-  Sprint               Sprint[]               @relation()
-  UserStory            UserStory[]            @relation()
-  Epic                 Epic[]                 @relation()
+  id              String                 @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
+  name            String
+  description     String?
+  key             String
+  active          Boolean?               @default(true)
+  createdBy       User                   @relation(fields: [userId], references: [id])
+  createdAt       DateTime?              @default(now())
+  updatedAt       DateTime?              @default(now())
+  history         Json?                  @default("[]")
+  userId          String
+  workingsTimes   WorkingTime[]          @relation()
+  labels          WorkspaceLabel[]       @relation()
+  userStoryStatus WorkspaceStoryStatus[] @relation()
+  teams           Team[]                 @relation()
+  sprints         Sprint[]               @relation()
+  userStories     UserStory[]            @relation()
+  epics           Epic[]                 @relation()
 }
 
 model Team {
-  id          String       @id @unique @default(cuid())
+  id          String       @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   workspace   Workspace    @relation(fields: [workspaceId], references: [id])
   name        String
   createdBy   User         @relation("createdBy", fields: [userId], references: [id])
@@ -79,7 +83,7 @@ model Team {
 }
 
 model TeamPolicy {
-  id        String    @id @unique @default(cuid())
+  id        String    @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name      String
   createdBy User      @relation(fields: [userId], references: [id])
   userId    String
@@ -91,7 +95,7 @@ model TeamPolicy {
 }
 
 model WorkspaceLabel {
-  id          String      @id @unique @default(cuid())
+  id          String      @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   workspace   Workspace   @relation(fields: [workspaceId], references: [id])
   name        String
   color       Json?       @default("{}")
@@ -106,7 +110,7 @@ model WorkspaceLabel {
 }
 
 model WorkspaceStoryStatus {
-  id          String      @id @unique @default(cuid())
+  id          String      @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   workspace   Workspace   @relation(fields: [workspaceId], references: [id])
   name        String
   done        Boolean     @default(false)
@@ -120,7 +124,7 @@ model WorkspaceStoryStatus {
 }
 
 model WorkingTime {
-  id          String            @id @unique @default(cuid())
+  id          String            @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String?
   workspace   Workspace         @relation(fields: [workspaceId], references: [id])
   status      WorkingTimeStatus
@@ -128,7 +132,7 @@ model WorkingTime {
   ending      DateTime?
   createdAt   DateTime?         @default(now())
   createdBy   User              @relation(fields: [userId], references: [id])
-  UserStory   UserStory         @relation(fields: [userStoryId], references: [id])
+  userStory   UserStory         @relation(fields: [userStoryId], references: [id])
   userStoryId String
   updatedAt   DateTime?
   history     Json?             @default("[]")
@@ -137,14 +141,14 @@ model WorkingTime {
 }
 
 model UserStory {
-  id                     String               @id @unique @default(cuid())
+  id                     String               @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name                   String
   description            String?
   deadline               DateTime?
   points                 Int?
   priority               Int?
   labels                 WorkspaceLabel[]     @relation()
-  Attachment             Attachment[]         @relation()
+  attachments            Attachment[]         @relation()
   parentId               String?
   parent                 UserStory?           @relation("Parent", fields: [parentId], references: [id])
   dependencies           UserStory[]          @relation("Parent")
@@ -158,15 +162,15 @@ model UserStory {
   workspaceId            String
   history                Json?                @default("[]")
   userId                 String
-  WorkspaceStoryStatus   WorkspaceStoryStatus @relation(fields: [workspaceStoryStatusId], references: [id])
+  status                 WorkspaceStoryStatus @relation(fields: [workspaceStoryStatusId], references: [id])
   workspaceStoryStatusId String
-  Sprint                 Sprint?              @relation(fields: [sprintId], references: [id])
+  sprint                 Sprint?              @relation(fields: [sprintId], references: [id])
   sprintId               String?
   WorkingTime            WorkingTime[]        @relation()
 }
 
 model Epic {
-  id          String           @id @unique @default(cuid())
+  id          String           @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   description String?
   deadline    DateTime?
@@ -174,8 +178,8 @@ model Epic {
   points      Int?
   priority    Int?
   labels      WorkspaceLabel[] @relation()
-  Attachment  Attachment[]     @relation()
-  UserStory   UserStory[]      @relation()
+  attachments Attachment[]     @relation()
+  userStories UserStory[]      @relation()
   createdAt   DateTime?        @default(now())
   updatedAt   DateTime?        @default(now())
   createdBy   User             @relation(fields: [userId], references: [id])
@@ -186,7 +190,7 @@ model Epic {
 }
 
 model Sprint {
-  id          String      @id @unique @default(cuid())
+  id          String      @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   description String?
   starting    DateTime?
@@ -202,7 +206,7 @@ model Sprint {
 }
 
 model Attachment {
-  id          String     @id @unique @default(cuid())
+  id          String     @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   path        String
   filetype    FileType
@@ -212,16 +216,16 @@ model Attachment {
   createdBy   User       @relation(fields: [userId], references: [id])
   userId      String
   history     Json?      @default("[]")
-  UserStory   UserStory? @relation(fields: [userStoryId], references: [id])
+  userStory   UserStory? @relation(fields: [userStoryId], references: [id])
   userStoryId String?
-  Epic        Epic?      @relation(fields: [epicId], references: [id])
+  epic        Epic?      @relation(fields: [epicId], references: [id])
   epicId      String?
-  Directory   Directory? @relation(fields: [DirectoryId], references: [id])
+  directory   Directory? @relation(fields: [DirectoryId], references: [id])
   DirectoryId String?
 }
 
 model Comment {
-  id        String    @id @unique @default(cuid())
+  id        String    @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   content   String?
   updatedAt DateTime? @default(now())
   createdAt DateTime? @default(now())
@@ -232,7 +236,7 @@ model Comment {
 }
 
 model Library {
-  id          String      @id @unique @default(cuid())
+  id          String      @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   directories Directory[] @relation()
   updatedAt   DateTime?   @default(now())
@@ -243,7 +247,7 @@ model Library {
 }
 
 model Directory {
-  id          String       @id @unique @default(cuid())
+  id          String       @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   documents   Document[]   @relation()
   attachments Attachment[] @relation()
@@ -257,7 +261,7 @@ model Directory {
 }
 
 model Document {
-  id          String    @id @unique @default(cuid())
+  id          String    @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name        String
   content     Json      @default("{}")
   directory   Directory @relation(fields: [directoryId], references: [id])
@@ -270,12 +274,56 @@ model Document {
 }
 
 model Customer {
-  id      String       @id @unique @default(cuid())
+  id      String       @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
   name    String
   type    CustomerType @default(Company)
   address String
   city    String
   phone   String
+}
+
+model Template {
+  id        String           @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
+  name      String
+  content   String
+  itemType  TemplateItemType
+  updatedAt DateTime?        @default(now())
+  createdAt DateTime?        @default(now())
+  createdBy User             @relation(fields: [userId], references: [id])
+  userId    String
+  history   Json?
+}
+
+model Role {
+  id              String    @id @unique @default(dbgenerated("nanoid()")) @db.VarChar(22)
+  name            String
+  default         Boolean   @default(false)
+  user            Json
+  workspace       Json
+  workspaceLabel  Json
+  workspaceStatus Json
+  workingTime     Json
+  team            Json
+  template        Json
+  teamPolicy      Json
+  document        Json
+  sprint          Json
+  epic            Json
+  userStory       Json
+  attachment      Json
+  role            Json
+  description     String
+  updatedAt       DateTime? @default(now())
+  createdAt       DateTime? @default(now())
+  createdBy       User?     @relation("createdBy", fields: [userId], references: [id])
+  userId          String?
+  history         Json?
+  User            User[]    @relation()
+}
+
+enum TemplateItemType {
+  UserStory
+  Epic
 }
 
 enum CustomerType {

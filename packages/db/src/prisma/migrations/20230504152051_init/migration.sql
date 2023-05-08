@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "TemplateItemType" AS ENUM ('UserStory', 'Epic');
+
+-- CreateEnum
 CREATE TYPE "CustomerType" AS ENUM ('Company', 'Customer');
 
 -- CreateEnum
@@ -12,7 +15,7 @@ CREATE TYPE "FileType" AS ENUM ('Picture', 'Document', 'Other');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "email" TEXT NOT NULL,
     "firstname" TEXT NOT NULL,
     "lastname" TEXT NOT NULL,
@@ -26,13 +29,14 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "authMethod" "AuthMethod" NOT NULL,
+    "roleId" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Workspace" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
     "key" TEXT NOT NULL,
@@ -47,7 +51,7 @@ CREATE TABLE "Workspace" (
 
 -- CreateTable
 CREATE TABLE "Team" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -59,7 +63,7 @@ CREATE TABLE "Team" (
 
 -- CreateTable
 CREATE TABLE "TeamPolicy" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -72,7 +76,7 @@ CREATE TABLE "TeamPolicy" (
 
 -- CreateTable
 CREATE TABLE "WorkspaceLabel" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "color" JSONB DEFAULT '{}',
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +90,7 @@ CREATE TABLE "WorkspaceLabel" (
 
 -- CreateTable
 CREATE TABLE "WorkspaceStoryStatus" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "done" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -100,7 +104,7 @@ CREATE TABLE "WorkspaceStoryStatus" (
 
 -- CreateTable
 CREATE TABLE "WorkingTime" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT,
     "status" "WorkingTimeStatus" NOT NULL,
     "starting" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -117,7 +121,7 @@ CREATE TABLE "WorkingTime" (
 
 -- CreateTable
 CREATE TABLE "UserStory" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
     "deadline" TIMESTAMP(3),
@@ -138,7 +142,7 @@ CREATE TABLE "UserStory" (
 
 -- CreateTable
 CREATE TABLE "Epic" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
     "deadline" TIMESTAMP(3),
@@ -156,7 +160,7 @@ CREATE TABLE "Epic" (
 
 -- CreateTable
 CREATE TABLE "Sprint" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
     "starting" TIMESTAMP(3),
@@ -172,7 +176,7 @@ CREATE TABLE "Sprint" (
 
 -- CreateTable
 CREATE TABLE "Attachment" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "filetype" "FileType" NOT NULL,
@@ -190,7 +194,7 @@ CREATE TABLE "Attachment" (
 
 -- CreateTable
 CREATE TABLE "Comment" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "content" TEXT,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -203,7 +207,7 @@ CREATE TABLE "Comment" (
 
 -- CreateTable
 CREATE TABLE "Library" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -215,7 +219,7 @@ CREATE TABLE "Library" (
 
 -- CreateTable
 CREATE TABLE "Directory" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "libraryId" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
@@ -228,7 +232,7 @@ CREATE TABLE "Directory" (
 
 -- CreateTable
 CREATE TABLE "Document" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "content" JSONB NOT NULL DEFAULT '{}',
     "directoryId" TEXT NOT NULL,
@@ -242,7 +246,7 @@ CREATE TABLE "Document" (
 
 -- CreateTable
 CREATE TABLE "Customer" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
     "name" TEXT NOT NULL,
     "type" "CustomerType" NOT NULL DEFAULT 'Company',
     "address" TEXT NOT NULL,
@@ -253,27 +257,69 @@ CREATE TABLE "Customer" (
 );
 
 -- CreateTable
+CREATE TABLE "Template" (
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
+    "name" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "itemType" "TemplateItemType" NOT NULL,
+    "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT NOT NULL,
+    "history" JSONB,
+
+    CONSTRAINT "Template_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Role" (
+    "id" VARCHAR(22) NOT NULL DEFAULT nanoid(),
+    "name" TEXT NOT NULL,
+    "default" BOOLEAN NOT NULL DEFAULT false,
+    "user" JSONB NOT NULL,
+    "workspace" JSONB NOT NULL,
+    "workspaceLabel" JSONB NOT NULL,
+    "workspaceStatus" JSONB NOT NULL,
+    "workingTime" JSONB NOT NULL,
+    "team" JSONB NOT NULL,
+    "template" JSONB NOT NULL,
+    "teamPolicy" JSONB NOT NULL,
+    "document" JSONB NOT NULL,
+    "sprint" JSONB NOT NULL,
+    "epic" JSONB NOT NULL,
+    "userStory" JSONB NOT NULL,
+    "attachment" JSONB NOT NULL,
+    "role" JSONB NOT NULL,
+    "description" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT,
+    "history" JSONB,
+
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_assignedTo" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+    "A" VARCHAR(22) NOT NULL,
+    "B" VARCHAR(22) NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "_members" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+    "A" VARCHAR(22) NOT NULL,
+    "B" VARCHAR(22) NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "_UserStoryToWorkspaceLabel" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+    "A" VARCHAR(22) NOT NULL,
+    "B" VARCHAR(22) NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "_EpicToWorkspaceLabel" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+    "A" VARCHAR(22) NOT NULL,
+    "B" VARCHAR(22) NOT NULL
 );
 
 -- CreateIndex
@@ -328,6 +374,12 @@ CREATE UNIQUE INDEX "Document_id_key" ON "Document"("id");
 CREATE UNIQUE INDEX "Customer_id_key" ON "Customer"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Template_id_key" ON "Template"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_id_key" ON "Role"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_assignedTo_AB_unique" ON "_assignedTo"("A", "B");
 
 -- CreateIndex
@@ -350,6 +402,9 @@ CREATE UNIQUE INDEX "_EpicToWorkspaceLabel_AB_unique" ON "_EpicToWorkspaceLabel"
 
 -- CreateIndex
 CREATE INDEX "_EpicToWorkspaceLabel_B_index" ON "_EpicToWorkspaceLabel"("B");
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Workspace" ADD CONSTRAINT "Workspace_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -446,6 +501,12 @@ ALTER TABLE "Document" ADD CONSTRAINT "Document_directoryId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "Document" ADD CONSTRAINT "Document_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Template" ADD CONSTRAINT "Template_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Role" ADD CONSTRAINT "Role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_assignedTo" ADD CONSTRAINT "_assignedTo_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
