@@ -11,12 +11,14 @@ import { LoggedUser } from '../../decorators/user.decorator';
 import { ChangeDefaultRole, CreateRole } from '@pito/types';
 import { User } from '@pito/db';
 import { RoleService } from './role.service';
+import {PermissionDecorator} from "../../decorators/permission.decorator";
 
 @Controller('role')
 export class RoleController {
   constructor(private service: RoleService) {}
 
   @Post()
+  @PermissionDecorator("user.view")
   public async create(@LoggedUser() user: User, @Body() body: CreateRole) {
     return this.service.create(user, body);
   }

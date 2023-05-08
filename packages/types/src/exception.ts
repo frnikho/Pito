@@ -11,6 +11,10 @@ export type ValidationExceptionParams = {
   target?: any;
 }
 
+export type PermissionExceptionparams = {
+  permissions: string[];
+}
+
 export class ApiException extends Error {
 
   public readonly statusCode: number;
@@ -35,4 +39,16 @@ export class ValidationException extends Error {
     this.errors = params?.errors ?? [];
     this.target = params?.target ?? {};
   }
+}
+
+export class PermissionException extends Error {
+  public readonly statusCode: number;
+  public readonly permissions: string[];
+
+  constructor(params?: PermissionExceptionparams) {
+    super("You don`t have enough privileges to do that !");
+    this.statusCode = 403;
+    this.permissions = params.permissions;
+  }
+
 }
